@@ -1,2 +1,2 @@
 #!/bin/bash
-sudo find . -type d -exec chmod u=rwx,g=rwx,o+rx
+sudo find . -type d -exec chmod u+rwx,g+rwx,o+rwx
