@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-# Sniffs a packet over an unencrypted connection
-tcpdump -A port 587
