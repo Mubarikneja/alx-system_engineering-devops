@@ -1,27 +1,18 @@
 #!/usr/bin/env bash
-# information about server domains
+#Configure your domain zone
 
-check_domain() {
-	SUBDOMAINS='www lb-01 web-01 web-02'
-
-	if [ -z "$1" ]; then
-		exit
-	fi
-	if [ -z "$2" ]; then
-		echo "$SUBDOMAINS" | awk -v domain="$1"\
-		'BEGIN { RS=" " }
-		{split($0,ARR," ");
-		cmd = "dig " ARR[1]"."domain " | grep -A1 \"ANSWER SECTION:\" | tail -n1";
-		system(cmd)
-		close(cmd)}' | awk\
-		'{
-		split($0, DOMS, ".");
-		print "The subdomain " DOMS[1] " is a " $4 " record and points to " $5}'
-	else
-		dig "$2.$1" | grep -A1 "ANSWER SECTION:" | tail -n1 | awk\
-		'{
-		split($0, DOMS, ".");
-		print "The subdomain " DOMS[1] " is a " $4 " record and points to " $5}'
-	fi
-}
-check_domain "$1" "$2"
+if [ "$#" = 1 ]
+then
+    subdom=("www" "lb-01" "web-01" "web-02")
+    for sub_domain in "${subdom[@]}"
+    do
+	rec_t=$(dig $sub_domain.$1 | grep -A1 'ANSWER SECTION' | tail -1 | awk '{print $4}')
+        des=$(dig $sub_domain.$1 | grep -A1 'ANSWER SECTION' | tail -1 | awk '{print $5}')
+	echo "The subdomain $sub_domain is a $rec_t record and points to $des"
+    done
+elif [ "$#" = 2 ]
+then
+    rec_t=$(dig $2.$1 | grep -A1 'ANSWER SECTION' | tail -1 | awk '{print $4}')
+    des=$(dig $2.$1 | grep -A1 'ANSWER SECTION' | tail -1 | awk '{print $5}')
+    echo "The subdomain $2 is a $rec_t record and points to $des"
+fi
